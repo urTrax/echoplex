@@ -1032,6 +1032,12 @@ img {
   gap: 32px;
 }
 
+.about-members__grid--two {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
 .about-member {
   text-align: center;
 }

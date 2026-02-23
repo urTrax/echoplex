@@ -246,10 +246,13 @@
         <span id="pdpBreadcrumbTitle">Product</span>
       </nav>
       <div class="pdp__layout">
-        <div class="pdp__image" id="pdpImage">
-          <div class="merch__placeholder">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="64" height="64"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+        <div class="pdp__gallery">
+          <div class="pdp__image" id="pdpImage">
+            <div class="merch__placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="64" height="64"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+            </div>
           </div>
+          <div class="pdp__thumbs" id="pdpThumbs"></div>
         </div>
         <div class="pdp__details">
           <h1 class="pdp__title" id="pdpTitle">Product Name</h1>
@@ -259,6 +262,11 @@
             <div class="pdp__variant-options" id="pdpVariantOptions"></div>
           </div>
           <div class="pdp__actions">
+            <div class="pdp__qty">
+              <button class="pdp__qty-btn" id="pdpQtyMinus">−</button>
+              <input type="number" class="pdp__qty-input" id="pdpQty" value="1" min="1" max="99">
+              <button class="pdp__qty-btn" id="pdpQtyPlus">+</button>
+            </div>
             <button class="btn btn--primary btn--lg pdp__add-to-cart" id="pdpAddToCart">Add to Cart</button>
           </div>
           <div class="pdp__description" id="pdpDescription"></div>

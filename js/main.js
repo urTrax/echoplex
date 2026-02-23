@@ -108,10 +108,24 @@ document.addEventListener('DOMContentLoaded', () => {
       hideAllPages();
       productPage.style.display = '';
       document.querySelectorAll('[data-page="shop"]').forEach(a => a.classList.add('active'));
-      const slug = data?.id || '';
+      const slug = data?.productId || data?.id || '';
       history.pushState({ page: 'product', id: slug }, '', '#product/' + slug);
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      loadProduct(data);
+      if (data?.productId && ShopifyStore.isConfigured()) {
+        ShopifyStore.fetchProduct(data.productId).then(full => {
+          if (full) {
+            full.price = full.variants?.[0]?.price || data.price;
+            full.image = full.images?.[0]?.url || data.image;
+            full.imageAlt = full.images?.[0]?.alt || data.title;
+            full.variantId = full.variants?.[0]?.id || data.variantId;
+            loadProduct(full);
+          } else {
+            loadProduct(data);
+          }
+        });
+      } else {
+        loadProduct(data);
+      }
     } else if (page === 'about') {
       hideAllPages();
       aboutPage.style.display = '';
@@ -319,8 +333,15 @@ document.addEventListener('DOMContentLoaded', () => {
     checkoutBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       if (ShopifyStore.isConfigured()) {
+        checkoutBtn.textContent = 'Processing...';
+        checkoutBtn.disabled = true;
         const url = await ShopifyStore.createCheckout();
-        if (url) window.location.href = url;
+        if (url) {
+          window.location.href = url;
+        } else {
+          checkoutBtn.textContent = 'Checkout';
+          checkoutBtn.disabled = false;
+        }
       }
     });
   }
@@ -378,8 +399,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const price = parseFloat(btn.dataset.price);
         const id = btn.dataset.id || name.toLowerCase().replace(/\s+/g, '-');
         const variantId = btn.dataset.variant || '';
+        const card = btn.closest('.shop-card');
+        const image = card?.querySelector('.shop-card__img img')?.src || '';
 
-        ShopifyStore.addItem({ id, name, price, variantId });
+        ShopifyStore.addItem({ id, name, price, variantId, image });
 
         btn.textContent = 'Added!';
         btn.disabled = true;
@@ -440,11 +463,55 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('pdpPrice').textContent = '$' + product.price.toFixed(2);
 
     const imgContainer = document.getElementById('pdpImage');
-    if (product.image) {
-      imgContainer.innerHTML = `<img src="${product.image}" alt="${product.imageAlt || product.title}" loading="lazy">`;
+    const thumbsContainer = document.getElementById('pdpThumbs');
+    const images = product.images && product.images.length > 0
+      ? product.images
+      : product.image ? [{ url: product.image, alt: product.imageAlt || product.title }] : [];
+
+    const imageLabels = ['Front', 'Back', 'Detail', 'Alt', 'Extra'];
+
+    function setMainImage(idx) {
+      const label = images.length > 1 ? `<span class="pdp__image-label">${imageLabels[idx] || ''}</span>` : '';
+      imgContainer.innerHTML = `${label}<img src="${images[idx].url}" alt="${images[idx].alt || product.title}">`;
+    }
+
+    if (images.length > 0) {
+      setMainImage(0);
+
+      if (images.length > 1) {
+        thumbsContainer.style.display = 'flex';
+        thumbsContainer.innerHTML = images.map((img, i) =>
+          `<button class="pdp__thumb ${i === 0 ? 'active' : ''}" data-idx="${i}">
+            <img src="${img.url}" alt="${img.alt || product.title}" loading="lazy">
+          </button>`
+        ).join('');
+
+        thumbsContainer.querySelectorAll('.pdp__thumb').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const idx = parseInt(btn.dataset.idx);
+            setMainImage(idx);
+            thumbsContainer.querySelectorAll('.pdp__thumb').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+          });
+        });
+      } else {
+        thumbsContainer.style.display = 'none';
+        thumbsContainer.innerHTML = '';
+      }
     } else {
       imgContainer.innerHTML = `<div class="merch__placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="64" height="64"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>`;
+      thumbsContainer.style.display = 'none';
+      thumbsContainer.innerHTML = '';
     }
+
+    const qtyInput = document.getElementById('pdpQty');
+    qtyInput.value = 1;
+    document.getElementById('pdpQtyMinus').onclick = () => {
+      qtyInput.value = Math.max(1, parseInt(qtyInput.value) - 1);
+    };
+    document.getElementById('pdpQtyPlus').onclick = () => {
+      qtyInput.value = Math.min(99, parseInt(qtyInput.value) + 1);
+    };
 
     const variantsContainer = document.getElementById('pdpVariants');
     const variantOptions = document.getElementById('pdpVariantOptions');
@@ -493,7 +560,12 @@ document.addEventListener('DOMContentLoaded', () => {
         : product.title;
       const itemId = variantId || product.id;
 
-      ShopifyStore.addItem({ id: itemId, name: itemName, price, variantId });
+      const pdpImg = document.querySelector('#pdpImage img');
+      const image = pdpImg?.src || product.image || '';
+      const qty = parseInt(document.getElementById('pdpQty').value) || 1;
+      for (let q = 0; q < qty; q++) {
+        ShopifyStore.addItem({ id: itemId, name: itemName, price, variantId, image });
+      }
 
       newBtn.textContent = 'Added!';
       newBtn.disabled = true;

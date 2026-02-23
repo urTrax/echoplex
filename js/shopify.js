@@ -99,7 +99,9 @@ const ShopifyStore = {
     } else {
       bodyEl.innerHTML = this.cart.map(item => `
         <div class="cart-panel__item">
-          <div class="cart-panel__item-img"></div>
+          <div class="cart-panel__item-img">
+            ${item.image ? `<img src="${item.image}" alt="${item.name}">` : ''}
+          </div>
           <div class="cart-panel__item-info">
             <span class="cart-panel__item-name">${item.name}</span>
             <span class="cart-panel__item-price">$${item.price.toFixed(2)} × ${item.qty}</span>
@@ -267,17 +269,18 @@ const ShopifyStore = {
   async createCheckout() {
     if (!this.isConfigured() || this.cart.length === 0) return null;
 
-    const lineItems = this.cart
+    const lines = this.cart
       .filter(item => item.variantId)
-      .map(item => `{ variantId: "${item.variantId}", quantity: ${item.qty} }`)
+      .map(item => `{ merchandiseId: "${item.variantId}", quantity: ${item.qty} }`)
       .join(',');
 
     const mutation = `mutation {
-      checkoutCreate(input: { lineItems: [${lineItems}] }) {
-        checkout {
-          webUrl
+      cartCreate(input: { lines: [${lines}] }) {
+        cart {
+          checkoutUrl
         }
-        checkoutUserErrors {
+        userErrors {
+          field
           message
         }
       }
@@ -293,7 +296,11 @@ const ShopifyStore = {
         body: JSON.stringify({ query: mutation }),
       });
       const data = await res.json();
-      return data.data.checkoutCreate.checkout.webUrl;
+      if (data.data?.cartCreate?.userErrors?.length) {
+        console.error('Cart errors:', data.data.cartCreate.userErrors);
+        return null;
+      }
+      return data.data.cartCreate.cart.checkoutUrl;
     } catch (err) {
       console.error('Checkout error:', err);
       return null;

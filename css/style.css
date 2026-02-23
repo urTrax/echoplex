@@ -2263,6 +2263,10 @@ img {
     display: flex;
   }
 
+  .nav__center {
+    display: none;
+  }
+
   .nav__band-logo {
     height: 44px;
   }

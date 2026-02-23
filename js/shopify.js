@@ -11,8 +11,8 @@
 */
 
 const ShopifyConfig = {
-  storeDomain: '',       // e.g. 'your-store.myshopify.com'
-  storefrontToken: '',   // your Storefront API access token
+  storeDomain: 'echoplex-merch.myshopify.com',
+  storefrontToken: 'b269344acc2cd51df11185a8d2935eeb',
 };
 
 const CART_STORAGE_KEY = 'echoplex_cart';

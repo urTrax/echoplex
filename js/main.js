@@ -274,13 +274,52 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ---------- Email signup form ----------
-  signupForm.addEventListener('submit', (e) => {
+  let signupMessageTimer = null;
+
+  function showSignupMessage(message, type = 'success') {
+    if (!confirmation) return;
+    confirmation.textContent = message;
+    confirmation.classList.remove('show', 'success', 'error');
+    confirmation.classList.add(type === 'error' ? 'error' : 'success');
+    // Reflow so transition always plays for repeated submissions.
+    void confirmation.offsetWidth;
+    confirmation.classList.add('show');
+
+    if (signupMessageTimer) clearTimeout(signupMessageTimer);
+    signupMessageTimer = setTimeout(() => {
+      confirmation.classList.remove('show');
+    }, 4500);
+  }
+
+  signupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const input = signupForm.querySelector('input');
-    if (input.value) {
-      confirmation.classList.add('show');
-      input.value = '';
-      setTimeout(() => confirmation.classList.remove('show'), 4000);
+    const input = signupForm.querySelector('input[type="email"]');
+    const submitBtn = signupForm.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn ? submitBtn.textContent : 'Sign Up';
+    const email = input ? input.value.trim() : '';
+
+    if (!email) {
+      showSignupMessage('Please enter a valid email address.', 'error');
+      return;
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+    }
+
+    const result = await window.SupabaseEcho.addSignup(email);
+
+    if (result.ok) {
+      showSignupMessage(result.message || 'Welcome to the Echo Chamber.', 'success');
+      if (input) input.value = '';
+    } else {
+      showSignupMessage(result.message || 'Unable to sign up right now.', 'error');
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
     }
   });
 

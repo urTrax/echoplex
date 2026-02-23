@@ -717,6 +717,14 @@ img {
   pointer-events: none;
 }
 
+.signup__confirmation.success {
+  color: var(--red-glow);
+}
+
+.signup__confirmation.error {
+  color: #ff8b8b;
+}
+
 .signup__confirmation.show {
   opacity: 1;
   transform: translateY(0);

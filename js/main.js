@@ -551,6 +551,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // ---------- News Tabs (mobile) ----------
+  document.querySelectorAll('.news-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.news-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const layout = document.querySelector('.news-page__layout');
+      if (tab.dataset.tab === 'instagram') {
+        layout.classList.add('show-instagram');
+      } else {
+        layout.classList.remove('show-instagram');
+      }
+    });
+  });
+
   // ---------- News Feed (event delegation) ----------
   function initNewsFeed() {}
 

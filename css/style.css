@@ -1685,6 +1685,14 @@ img {
   border-radius: 50%;
   background: var(--gray-mid);
   flex-shrink: 0;
+  overflow: hidden;
+  padding: 4px;
+}
+
+.news-comment__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .news-comment__content {

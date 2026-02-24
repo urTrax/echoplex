@@ -705,7 +705,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const el = document.createElement('div');
           el.className = 'news-comment';
           el.innerHTML = `
-            <div class="news-comment__avatar"></div>
+            <div class="news-comment__avatar"><img src="assets/symbol-logo.png" alt=""></div>
             <div class="news-comment__content">
               <span class="news-comment__name">${c.username}</span>
               <p>${c.body}</p>
@@ -796,7 +796,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const newComment = document.createElement('div');
         newComment.className = 'news-comment';
         newComment.innerHTML = `
-          <div class="news-comment__avatar"></div>
+          <div class="news-comment__avatar"><img src="assets/symbol-logo.png" alt=""></div>
           <div class="news-comment__content">
             <span class="news-comment__name">${user.username}</span>
             <p>${text}</p>

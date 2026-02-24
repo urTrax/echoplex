@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ECHØPLEX — Electronic Press Kit</title>
+  <link rel="icon" type="image/png" href="../assets/symbol-logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --red: #c41e1e;
+      --red-glow: #e63333;
+      --black: #0a0a0a;
+      --white: #f0f0f0;
+      --gray: #888;
+      --font-body: 'Inter', -apple-system, sans-serif;
+      --font-display: 'Bebas Neue', Impact, sans-serif;
+      --font-title: 'Antonio', sans-serif;
+    }
+    html { -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-body); background: var(--black); color: var(--white); line-height: 1.6; }
+    a { color: var(--red-glow); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    img { max-width: 100%; display: block; }
+
+    .epk { max-width: 900px; margin: 0 auto; padding: 60px 32px 80px; }
+
+    .epk__header { text-align: center; margin-bottom: 60px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 40px; }
+    .epk__logo { height: 28px; margin: 0 auto 24px; opacity: 0.6; }
+    .epk__band-logo { height: 56px; margin: 0 auto 16px; }
+    .epk__subtitle { font-family: var(--font-display); font-size: 1.4rem; letter-spacing: 0.2em; color: var(--gray); text-transform: uppercase; margin-bottom: 20px; }
+    .epk__download-btn { display: inline-block; padding: 12px 32px; background: var(--red); color: #fff; font-family: var(--font-display); font-size: 1rem; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; transition: background 0.3s ease; border: none; cursor: pointer; }
+    .epk__download-btn:hover { background: var(--red-glow); text-decoration: none; }
+
+    .epk__section { margin-bottom: 56px; }
+    .epk__section-title { font-family: var(--font-title); font-size: 1.8rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--red); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(196,30,30,0.3); }
+
+    .epk__bio p { margin-bottom: 16px; font-size: 0.95rem; color: var(--white); line-height: 1.8; }
+
+    .epk__quick-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 40px; }
+    .epk__fact { display: flex; flex-direction: column; gap: 2px; }
+    .epk__fact-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gray); font-weight: 500; }
+    .epk__fact-value { font-size: 0.95rem; color: var(--white); }
+
+    .epk__members { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    .epk__member { text-align: center; }
+    .epk__member-photo { width: 100%; aspect-ratio: 1; object-fit: cover; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.05); }
+    .epk__member-name { font-family: var(--font-body); font-size: 1.05rem; font-weight: 600; margin-bottom: 4px; }
+    .epk__member-role { font-size: 0.85rem; color: var(--gray); }
+
+    .epk__discography-item { display: flex; gap: 24px; align-items: center; padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .epk__album-art { width: 120px; height: 120px; object-fit: cover; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.05); }
+    .epk__album-info h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
+    .epk__album-info p { font-size: 0.85rem; color: var(--gray); margin-bottom: 2px; }
+
+    .epk__links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 40px; }
+    .epk__link-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .epk__link-label { font-size: 0.85rem; color: var(--gray); }
+    .epk__link-value { font-size: 0.85rem; }
+
+    .epk__contact-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+    .epk__contact-item { }
+    .epk__contact-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gray); font-weight: 500; margin-bottom: 4px; }
+    .epk__contact-value { font-size: 0.9rem; }
+
+    .epk__footer { text-align: center; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.08); margin-top: 60px; }
+    .epk__footer-logo { height: 24px; margin: 0 auto 12px; opacity: 0.4; }
+    .epk__footer p { font-size: 0.8rem; color: var(--gray); }
+    .epk__back { display: inline-block; margin-top: 20px; font-size: 0.85rem; color: var(--red-glow); }
+
+    @media print {
+      @page { margin: 0.5in; size: letter; }
+      body { background: #fff !important; color: #111 !important; }
+      .epk { padding: 0; max-width: 100%; }
+      a { color: #c41e1e !important; }
+      .epk__section { break-inside: avoid; page-break-inside: avoid; }
+      .epk__members { break-inside: avoid; page-break-inside: avoid; }
+      .epk__header { border-color: #ddd !important; }
+      .epk__subtitle { color: #555 !important; }
+      .epk__section-title { color: #c41e1e !important; border-color: rgba(196,30,30,0.4) !important; }
+      .epk__bio p { color: #222 !important; }
+      .epk__fact-value { color: #111 !important; }
+      .epk__member-name { color: #111 !important; }
+      .epk__fact-label, .epk__member-role, .epk__link-label, .epk__contact-label, .epk__album-info p, .epk__footer p { color: #666 !important; }
+      .epk__link-row { border-color: #eee !important; }
+      .epk__back, .epk__download-btn { display: none !important; }
+      .epk__member-photo, .epk__album-art { border: 1px solid #ddd !important; }
+      .epk__footer { border-color: #ddd !important; }
+      .epk__discography-item { border-color: #eee !important; }
+      .epk__album-info h3 { color: #111 !important; }
+      .epk__contact-value { color: #111 !important; }
+      .epk__logo { filter: invert(1); }
+      .epk__band-logo { filter: invert(1); }
+      .epk__footer-logo { filter: invert(1); }
+    }
+
+    @media (max-width: 600px) {
+      .epk__quick-facts, .epk__members, .epk__links-grid { grid-template-columns: 1fr; }
+      .epk__contact-grid { grid-template-columns: 1fr; }
+      .epk__discography-item { flex-direction: column; align-items: flex-start; }
+      .epk__album-art { width: 100%; height: auto; aspect-ratio: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="epk">
+
+    <header class="epk__header">
+      <img src="../assets/symbol-logo.png" alt="" class="epk__logo">
+      <img src="../assets/band-logo.png" alt="ECHØPLEX" class="epk__band-logo">
+      <p class="epk__subtitle">Electronic Press Kit</p>
+      <button onclick="window.print()" class="epk__download-btn">Download as PDF</button>
+    </header>
+
+    <section class="epk__section">
+      <h2 class="epk__section-title">Quick Facts</h2>
+      <div class="epk__quick-facts">
+        <div class="epk__fact">
+          <span class="epk__fact-label">Artist</span>
+          <span class="epk__fact-value">Echoplex</span>
+        </div>
+        <div class="epk__fact">
+          <span class="epk__fact-label">Genre</span>
+          <span class="epk__fact-value">Nu Metal / Industrial / Alternative Metal</span>
+        </div>
+        <div class="epk__fact">
+          <span class="epk__fact-label">Location</span>
+          <span class="epk__fact-value">United States</span>
+        </div>
+        <div class="epk__fact">
+          <span class="epk__fact-label">Established</span>
+          <span class="epk__fact-value">2026</span>
+        </div>
+        <div class="epk__fact">
+          <span class="epk__fact-label">Label</span>
+          <span class="epk__fact-value">Independent / Codex Collective</span>
+        </div>
+        <div class="epk__fact">
+          <span class="epk__fact-label">Latest Release</span>
+          <span class="epk__fact-value">Surrender E.P. (2026)</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="epk__section epk__bio">
+      <h2 class="epk__section-title">Bio</h2>
+      <p>Echoplex fuses nu metal, industrial, '90s alternative, and modern metal into a sound that feels both familiar and forward-leaning. Their music reflects a world caught in recursive collapse—externally fractured, internally conflicted—while exploring the repeating cycles within society, humanity, and the self.</p>
+      <p>Through Echoplex and their creative hub, Codex Collective, the project pursues evolution through sound—confronting chaos, extracting meaning, and moving toward ascension both musically and philosophically. The result is a body of work that sits at the intersection of analog instinct and digital consciousness.</p>
+      <p>All lyrics written by Sammy Mata and Rob Hoyt. All music written, performed, and recorded by Echoplex.</p>
+    </section>
+
+    <section class="epk__section">
+      <h2 class="epk__section-title">Members</h2>
+      <div class="epk__members">
+        <div class="epk__member">
+          <img src="../assets/sammy.png" alt="Sammy Mata" class="epk__member-photo">
+          <p class="epk__member-name">Sammy Mata</p>
+          <p class="epk__member-role">Vocals / Guitar / Programming</p>
+        </div>
+        <div class="epk__member">
+          <img src="../assets/rob.png" alt="Rob Hoyt" class="epk__member-photo">
+          <p class="epk__member-name">Rob Hoyt</p>
+          <p class="epk__member-role">Vocals / Guitar / Bass / Drums / Programming / Synth</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="epk__section">
+      <h2 class="epk__section-title">Discography</h2>
+      <div class="epk__discography-item">
+        <img src="../assets/album-cover.png" alt="Surrender E.P." class="epk__album-art">
+        <div class="epk__album-info">
+          <h3>Surrender E.P.</h3>
+          <p>Released 2026 &middot; 5 Tracks</p>
+          <p>Tracks: Surrender &middot; Pity &middot; The Cycle &middot; The Deep &middot; Waiting for Me</p>
+          <p><a href="https://open.spotify.com/album/38xarzu0o4qIQT37YYgHBw" target="_blank">Spotify</a> &middot; <a href="https://music.apple.com/us/album/surrender-ep/1879483796" target="_blank">Apple Music</a> &middot; <a href="https://lnk.to/echoplex-surrender" target="_blank">All Platforms</a></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="epk__section">
+      <h2 class="epk__section-title">Links</h2>
+      <div class="epk__links-grid">
+        <div class="epk__link-row">
+          <span class="epk__link-label">Website</span>
+          <a href="https://echoplexmusic.com" target="_blank">echoplexmusic.com</a>
+        </div>
+        <div class="epk__link-row">
+          <span class="epk__link-label">Spotify</span>
+          <a href="https://open.spotify.com/album/38xarzu0o4qIQT37YYgHBw" target="_blank">Echoplex on Spotify</a>
+        </div>
+        <div class="epk__link-row">
+          <span class="epk__link-label">Apple Music</span>
+          <a href="https://music.apple.com/us/album/surrender-ep/1879483796" target="_blank">Echoplex on Apple Music</a>
+        </div>
+        <div class="epk__link-row">
+          <span class="epk__link-label">YouTube</span>
+          <a href="https://www.youtube.com/@echoplex_music" target="_blank">@echoplex_music</a>
+        </div>
+        <div class="epk__link-row">
+          <span class="epk__link-label">Instagram</span>
+          <a href="https://www.instagram.com/echoplexmusicofficial/" target="_blank">@echoplexmusicofficial</a>
+        </div>
+        <div class="epk__link-row">
+          <span class="epk__link-label">Merch</span>
+          <a href="https://echoplexmusic.com/#shop" target="_blank">echoplexmusic.com/#shop</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="epk__section">
+      <h2 class="epk__section-title">Contact</h2>
+      <div class="epk__contact-grid">
+        <div class="epk__contact-item">
+          <p class="epk__contact-label">Booking</p>
+          <p class="epk__contact-value"><a href="mailto:booking@echoplexmusic.com">booking@echoplexmusic.com</a></p>
+        </div>
+        <div class="epk__contact-item">
+          <p class="epk__contact-label">Management</p>
+          <p class="epk__contact-value"><a href="mailto:mgmt@codexcollectivemusic.com">mgmt@codexcollectivemusic.com</a></p>
+        </div>
+        <div class="epk__contact-item">
+          <p class="epk__contact-label">Press</p>
+          <p class="epk__contact-value"><a href="mailto:press@echoplexmusic.com">press@echoplexmusic.com</a></p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="epk__footer">
+      <img src="../assets/symbol-logo.png" alt="" class="epk__footer-logo">
+      <p>&copy; 2026 Codex Collective LLC. All rights reserved.</p>
+      <a href="https://echoplexmusic.com" class="epk__back">&larr; Back to echoplexmusic.com</a>
+    </footer>
+
+  </div>
+</body>
+</html>

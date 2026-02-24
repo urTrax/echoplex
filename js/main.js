@@ -677,11 +677,48 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ---------- News Feed (event delegation) ----------
-  function initNewsFeed() {}
+  async function initNewsFeed() {
+    const posts = document.querySelectorAll('.news-post[data-post-id]');
+    if (!window.SupabaseNews || !SupabaseNews.isConfigured()) return;
+    const visitorId = getVisitorId();
+
+    for (const post of posts) {
+      const postId = post.dataset.postId;
+
+      const [likeCount, liked, comments] = await Promise.all([
+        SupabaseNews.getLikes(postId),
+        SupabaseNews.hasLiked(postId, visitorId),
+        SupabaseNews.getComments(postId),
+      ]);
+
+      const heartBtn = post.querySelector('.news-reaction[data-type="heart"]');
+      if (heartBtn) {
+        heartBtn.querySelector('span').textContent = likeCount;
+        if (liked) heartBtn.classList.add('active');
+      }
+
+      const commentsContainer = post.querySelector('.news-comments');
+      const commentCountEl = post.querySelector('.news-reaction[data-type="comment"] span');
+      if (commentsContainer && comments.length > 0) {
+        const inputRow = commentsContainer.querySelector('.news-comment__input');
+        comments.forEach(c => {
+          const el = document.createElement('div');
+          el.className = 'news-comment';
+          el.innerHTML = `
+            <div class="news-comment__avatar"></div>
+            <div class="news-comment__content">
+              <span class="news-comment__name">${c.username}</span>
+              <p>${c.body}</p>
+            </div>`;
+          commentsContainer.insertBefore(el, inputRow);
+        });
+        if (commentCountEl) commentCountEl.textContent = comments.length;
+      }
+    }
+  }
 
   const newsFeedEl = document.getElementById('newsFeed');
   if (newsFeedEl) {
-    // Intercept comment input focus — require user profile
     newsFeedEl.addEventListener('focusin', (e) => {
       const commentInput = e.target.closest('.news-comment__input input');
       if (commentInput && !getUser()) {
@@ -692,16 +729,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    newsFeedEl.addEventListener('click', (e) => {
-      // Reaction buttons
+    newsFeedEl.addEventListener('click', async (e) => {
       const reactionBtn = e.target.closest('.news-reaction');
       if (reactionBtn) {
         e.preventDefault();
-        const countEl = reactionBtn.querySelector('span');
-        let count = parseInt(countEl.textContent) || 0;
+        const post = reactionBtn.closest('.news-post');
+        const postId = post?.dataset.postId;
 
         if (reactionBtn.dataset.type === 'comment') {
-          const post = reactionBtn.closest('.news-post');
           const comments = post.querySelector('.news-comments');
           if (comments) {
             comments.style.display = comments.style.display === 'none' ? '' : 'none';
@@ -709,17 +744,26 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
-        if (reactionBtn.classList.contains('active')) {
-          reactionBtn.classList.remove('active');
-          countEl.textContent = count - 1;
+        if (postId && SupabaseNews.isConfigured()) {
+          reactionBtn.disabled = true;
+          const result = await SupabaseNews.toggleLike(postId, getVisitorId());
+          reactionBtn.querySelector('span').textContent = result.count;
+          reactionBtn.classList.toggle('active', result.liked);
+          reactionBtn.disabled = false;
         } else {
-          reactionBtn.classList.add('active');
-          countEl.textContent = count + 1;
+          const countEl = reactionBtn.querySelector('span');
+          let count = parseInt(countEl.textContent) || 0;
+          if (reactionBtn.classList.contains('active')) {
+            reactionBtn.classList.remove('active');
+            countEl.textContent = count - 1;
+          } else {
+            reactionBtn.classList.add('active');
+            countEl.textContent = count + 1;
+          }
         }
         return;
       }
 
-      // Reply buttons
       const replyBtn = e.target.closest('.news-comment__input .btn');
       if (replyBtn) {
         e.preventDefault();
@@ -735,6 +779,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const text = input.value.trim();
         if (!text) return;
 
+        const post = replyBtn.closest('.news-post');
+        const postId = post?.dataset.postId;
+
+        replyBtn.disabled = true;
+
+        if (postId && SupabaseNews.isConfigured()) {
+          const saved = await SupabaseNews.addComment(postId, user.username, text);
+          if (!saved) {
+            replyBtn.disabled = false;
+            return;
+          }
+        }
+
         const commentsContainer = replyBtn.closest('.news-comments');
         const newComment = document.createElement('div');
         newComment.className = 'news-comment';
@@ -747,8 +804,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         commentsContainer.insertBefore(newComment, replyBtn.parentElement);
         input.value = '';
+        replyBtn.disabled = false;
 
-        const post = replyBtn.closest('.news-post');
         const commentCount = post.querySelector('.news-reaction[data-type="comment"] span');
         if (commentCount) {
           commentCount.textContent = parseInt(commentCount.textContent) + 1;
@@ -756,7 +813,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Enter key to submit comment
     newsFeedEl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && e.target.closest('.news-comment__input input')) {
         e.preventDefault();

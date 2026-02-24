@@ -80,3 +80,113 @@ const SupabaseEcho = {
 };
 
 window.SupabaseEcho = SupabaseEcho;
+
+/* ============================================
+   Supabase News Feed Persistence
+   ============================================ */
+
+const SupabaseNews = {
+  _headers() {
+    return {
+      'Content-Type': 'application/json',
+      apikey: SupabaseEchoConfig.anonKey,
+      Authorization: `Bearer ${SupabaseEchoConfig.anonKey}`,
+    };
+  },
+
+  _url(table, query) {
+    return `${SupabaseEchoConfig.url}/rest/v1/${table}${query || ''}`;
+  },
+
+  isConfigured() {
+    return SupabaseEcho.isConfigured();
+  },
+
+  async getLikes(postId) {
+    if (!this.isConfigured()) return 0;
+    try {
+      const res = await fetch(
+        this._url('news_likes', `?post_id=eq.${encodeURIComponent(postId)}&select=id`),
+        { headers: { ...this._headers(), Prefer: 'count=exact' } }
+      );
+      const range = res.headers.get('content-range');
+      if (range) {
+        const total = range.split('/')[1];
+        return total === '*' ? 0 : parseInt(total);
+      }
+      const data = await res.json();
+      return Array.isArray(data) ? data.length : 0;
+    } catch (e) { return 0; }
+  },
+
+  async hasLiked(postId, visitorId) {
+    if (!this.isConfigured()) return false;
+    try {
+      const res = await fetch(
+        this._url('news_likes', `?post_id=eq.${encodeURIComponent(postId)}&visitor_id=eq.${encodeURIComponent(visitorId)}&select=id`),
+        { headers: this._headers() }
+      );
+      const data = await res.json();
+      return Array.isArray(data) && data.length > 0;
+    } catch (e) { return false; }
+  },
+
+  async toggleLike(postId, visitorId) {
+    if (!this.isConfigured()) return { liked: false, count: 0 };
+    try {
+      const liked = await this.hasLiked(postId, visitorId);
+      if (liked) {
+        await fetch(
+          this._url('news_likes', `?post_id=eq.${encodeURIComponent(postId)}&visitor_id=eq.${encodeURIComponent(visitorId)}`),
+          { method: 'DELETE', headers: this._headers() }
+        );
+      } else {
+        await fetch(this._url('news_likes'), {
+          method: 'POST',
+          headers: { ...this._headers(), Prefer: 'return=minimal' },
+          body: JSON.stringify([{ post_id: postId, visitor_id: visitorId }]),
+        });
+      }
+      const count = await this.getLikes(postId);
+      return { liked: !liked, count };
+    } catch (e) { return { liked: false, count: 0 }; }
+  },
+
+  async getComments(postId) {
+    if (!this.isConfigured()) return [];
+    try {
+      const res = await fetch(
+        this._url('news_comments', `?post_id=eq.${encodeURIComponent(postId)}&order=created_at.asc&select=*`),
+        { headers: this._headers() }
+      );
+      if (!res.ok) return [];
+      return await res.json();
+    } catch (e) { return []; }
+  },
+
+  async addComment(postId, username, text) {
+    if (!this.isConfigured()) return null;
+    try {
+      const res = await fetch(this._url('news_comments'), {
+        method: 'POST',
+        headers: { ...this._headers(), Prefer: 'return=representation' },
+        body: JSON.stringify([{ post_id: postId, username, body: text }]),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data[0] || null;
+    } catch (e) { return null; }
+  },
+};
+
+function getVisitorId() {
+  let id = localStorage.getItem('echoplex_visitor_id');
+  if (!id) {
+    id = 'v_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem('echoplex_visitor_id', id);
+  }
+  return id;
+}
+
+window.SupabaseNews = SupabaseNews;
+window.getVisitorId = getVisitorId;

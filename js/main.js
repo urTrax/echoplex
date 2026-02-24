@@ -376,6 +376,9 @@ document.addEventListener('DOMContentLoaded', () => {
         checkoutBtn.disabled = true;
         const url = await ShopifyStore.createCheckout();
         if (url) {
+          ShopifyStore.cart = [];
+          ShopifyStore.saveCart();
+          ShopifyStore.updateUI();
           window.location.href = url;
         } else {
           checkoutBtn.textContent = 'Checkout';

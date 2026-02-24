@@ -765,8 +765,7 @@ img {
   position: relative;
   aspect-ratio: 1;
   overflow: hidden;
-  background: #2A2A2A;
-  padding: 24px;
+  background: var(--gray-dark);
 }
 
 @supports not (aspect-ratio: 1) {
@@ -775,12 +774,10 @@ img {
   }
   .merch__img-wrap img {
     position: absolute;
-    top: 24px;
-    left: 24px;
-    right: 24px;
-    bottom: 24px;
-    width: calc(100% - 48px);
-    height: calc(100% - 48px);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
   }
 }
 

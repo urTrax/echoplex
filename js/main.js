@@ -31,6 +31,38 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---------- Init Shopify Cart ----------
   ShopifyStore.init();
 
+  // ---------- Order confirmation toast ----------
+  function showOrderToast() {
+    const toast = document.createElement('div');
+    toast.className = 'order-toast';
+    toast.innerHTML = `
+      <div class="order-toast__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <div class="order-toast__text">
+        <strong>Checkout Opened</strong>
+        <p>Complete your purchase in the new tab. You'll receive a confirmation email once your order is placed.</p>
+      </div>
+      <button class="order-toast__close" aria-label="Close">&times;</button>`;
+    document.body.appendChild(toast);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => toast.classList.add('show'));
+    });
+
+    toast.querySelector('.order-toast__close').addEventListener('click', () => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 400);
+    });
+
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
+      }
+    }, 8000);
+  }
+
   // ---------- Featured Merch on Homepage ----------
   function renderFeaturedMerch(products) {
     const grid = document.getElementById('featuredMerchGrid');
@@ -379,7 +411,9 @@ document.addEventListener('DOMContentLoaded', () => {
           ShopifyStore.cart = [];
           ShopifyStore.saveCart();
           ShopifyStore.updateUI();
-          window.location.href = url;
+          closeCart();
+          window.open(url, '_blank');
+          showOrderToast();
         } else {
           checkoutBtn.textContent = 'Checkout';
           checkoutBtn.disabled = false;
